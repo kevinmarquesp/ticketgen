@@ -59,3 +59,76 @@ const toPortuguese = Object.freeze({
   [PATTY.REGULAR]: "Carne 10:1",
   [PATTY.CHICKEN]: "Carne de Chicken",
 });
+
+/**
+ * @typedef MealProps
+ * @property {string} name Display name for the UI.
+ * @property {BREAD} bread Kind of bread for this meal.
+ * @property {SAUCE[]} sauces Sausages used to create this meal.
+ * @property {CONDIMENT[]} condiments List of condiments to build the meal.
+ */
+
+class Meal {
+  #props = undefined;
+  #removed = [];
+
+  /** @param {MealProps} props */
+  constructor(props) {
+    this.#props = props;
+  }
+
+  /**
+   * Generates a order string for the current meal.
+   * @returns {string}
+   */
+  text() {
+    let result = `${this.#props.name}`;
+
+    if (this.#removed.length < 1)
+      return result;
+
+    for (let ri of new Set(this.#removed)) {
+      const rem = this.#removed.filter(e => e === ri).length;
+
+      if (this.#remaining(ri) < 1) {
+        result += `\n  SEM ${toPortuguese[ri]}`;
+        continue;
+      }
+
+      result += `\n  MENOS ${rem} ${toPortuguese[ri]}`;
+    }
+
+    return result;
+  }
+
+  /**
+   * Adds a single item (condiment or sauce) to the removed list.
+   * @param {CONDIMENT | SAUCE} item Single condiment or sauce to be removed.
+   */
+  remove(item) {
+    if (this.#remaining(item) < 1)
+      return;
+
+    this.#removed.push(item);
+  }
+
+  /**
+   * Get the remaning count present in the current state of the meal to remove.
+   * @param {CONDIMENT | SAUCE} item Condiment or sauce to count.
+   * @returns number
+   */
+  #remaining(item) {
+    const inCount = [
+      ...this.#props.condiments,
+      ...this.#props.sauces,
+    ].filter(e => e === item).length;
+
+    const offCount = this.#removed.filter(e => e === item).length;
+
+    return inCount - offCount;
+  }
+};
+
+// [TODO]: Aicionar o método de troca de molho.
+// [NOTE]: Considerando ketchup e mostarda como um único molho.
+// [TODO]: Por configuração para lanche GRILL.
