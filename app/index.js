@@ -132,3 +132,51 @@ class Meal {
 // [TODO]: Aicionar o método de troca de molho.
 // [NOTE]: Considerando ketchup e mostarda como um único molho.
 // [TODO]: Por configuração para lanche GRILL.
+
+const BigMac = new Meal({
+  name: "Big Mac",
+  bread: BREAD.BIGMAC,
+  sauces: [
+    SAUCE.BIGMAC,
+    SAUCE.BIGMAC,
+  ],
+  condiments: [
+    CONDIMENT.LETTUCE,
+    CONDIMENT.LETTUCE,
+    CONDIMENT.PICLES,
+    CONDIMENT.PICLES,
+    CONDIMENT.SLICED_CHEADDAR,
+    CONDIMENT.REIDRATED_ONION,
+    CONDIMENT.REIDRATED_ONION,
+  ],
+});
+
+BigMac.remove(CONDIMENT.LETTUCE);
+BigMac.remove(CONDIMENT.LETTUCE);
+BigMac.remove(CONDIMENT.PICLES);
+BigMac.remove(CONDIMENT.PICLES);
+BigMac.remove(CONDIMENT.REIDRATED_ONION);
+BigMac.remove(CONDIMENT.REIDRATED_ONION);
+
+console.log(BigMac.text());
+
+const Cheeseburger = new Meal({
+  name: "Cheeseburger",
+  bread: BREAD.REGULAR,
+  sauces: [
+    SAUCE.KETCHUP,
+    SAUCE.MUSTARD,
+  ],
+  condiments: [
+    CONDIMENT.PICLES,
+    CONDIMENT.SLICED_CHEADDAR,
+    CONDIMENT.REIDRATED_ONION,
+  ],
+})
+
+Cheeseburger.remove(SAUCE.KETCHUP);
+Cheeseburger.remove(SAUCE.MUSTARD);
+Cheeseburger.remove(CONDIMENT.PICLES);
+Cheeseburger.remove(CONDIMENT.REIDRATED_ONION);
+
+console.log(Cheeseburger.text());
