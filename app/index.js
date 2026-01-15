@@ -84,21 +84,59 @@ class Meal {
   text() {
     let result = `${this.#props.name}`;
 
+    if (this.#isGrill()) {
+      result += "\n  GRILL";
+
+      return result;
+    }
+
     if (this.#removed.length < 1)
       return result;
 
     for (let ri of new Set(this.#removed)) {
-      const rem = this.#removed.filter(e => e === ri).length;
+      const rem = this.#removed  // How much of this item was removed.
+        .filter(e => e === ri)
+        .length;
 
-      if (this.#remaining(ri) < 1) {
+      if (this.#remaining(ri) < 1) {  // If any can still be removed.
         result += `\n  SEM ${toPortuguese[ri]}`;
+
         continue;
       }
 
+      // If it's still possible to remove more.
       result += `\n  MENOS ${rem} ${toPortuguese[ri]}`;
     }
 
     return result;
+  }
+
+  /**
+   * Lists the current condiments/sauces in the meal, considering #removed.
+   * @returns {(CONDIMENT | SAUCE)[]}
+   */
+  getCurrent() {
+    return [
+      ...this.#props.condiments,
+      ...this.#props.sauces,
+    ].filter(e => !this.#removed.includes(e));
+  }
+
+  /**
+   * Determine if it's grill by comparing to the minimal GRILL requirements.
+   * @returns {bolean}
+   */
+  #isGrill() {
+    const grill = [
+      CONDIMENT.SLICED_CHEADDAR,
+      PATTY.REGULAR,
+      PATTY.QUARTER,
+      PATTY.CHICKEN,
+    ];
+
+    return this.getCurrent()
+      .filter(e => !grill.includes(e))
+      .length < 1;
   }
 
   /**
@@ -118,20 +156,24 @@ class Meal {
    * @returns number
    */
   #remaining(item) {
-    const inCount = [
+    const items = [  // How much is present in the meal by default.
       ...this.#props.condiments,
       ...this.#props.sauces,
-    ].filter(e => e === item).length;
+    ]
+      .filter(e => e === item)
+      .length;
 
-    const offCount = this.#removed.filter(e => e === item).length;
+    const removed = this.#removed  // How much to be removed.
+      .filter(e => e === item)
+      .length;
 
-    return inCount - offCount;
+    return items - removed;
   }
 };
 
 // [TODO]: Aicionar o método de troca de molho.
 // [NOTE]: Considerando ketchup e mostarda como um único molho.
-// [TODO]: Por configuração para lanche GRILL.
+// [TODO]: Por configuração para mostrar SOMENTE o que vai.
 
 const BigMac = new Meal({
   name: "Big Mac",
@@ -157,8 +199,11 @@ BigMac.remove(CONDIMENT.PICLES);
 BigMac.remove(CONDIMENT.PICLES);
 BigMac.remove(CONDIMENT.REIDRATED_ONION);
 BigMac.remove(CONDIMENT.REIDRATED_ONION);
+BigMac.remove(SAUCE.BIGMAC);
+BigMac.remove(SAUCE.BIGMAC);
 
 console.log(BigMac.text());
+//console.log(BigMac.getCurrent());
 
 const Cheeseburger = new Meal({
   name: "Cheeseburger",
@@ -179,4 +224,5 @@ Cheeseburger.remove(SAUCE.MUSTARD);
 Cheeseburger.remove(CONDIMENT.PICLES);
 Cheeseburger.remove(CONDIMENT.REIDRATED_ONION);
 
-console.log(Cheeseburger.text());
+//console.log(Cheeseburger.text());
+//console.log(Cheeseburger.getCurrent());
