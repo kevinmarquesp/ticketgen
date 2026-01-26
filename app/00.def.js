@@ -1,0 +1,43 @@
+const KITCHEN = Object.freeze({
+  REGULAR_BUN: "REGULAR_BUN",
+  BIGMAC_BUN: "BIGMAC_BUN",
+  DARK_BUN: "DARK_BUN",
+  QUARTER_BUN: "QUARTER_BUN",
+
+  LETTUCE: "LETTUCE",
+  PICLES: "PICLES",
+  SLI_CHEADDAR: "SLI_CHEADDAR",
+  REI_ONION: "REI_ONION",
+  FRESH_ONION: "FRESH_ONION",
+  SHOYO_ONION: "SHOYO_ONION",
+
+  BIGMAC_SAUCE: "BIGMAC_SAUCE",
+  KETCHUP: "KETCHUP",
+  MUSTARD: "MUSTARD",
+  CHEADDAR_MCMELT: "CHEADDAR_MCMELT",
+  MAYONESE: "MAYONESE",
+  CBO: "CBO",
+  CREAM_RANCH: "CREAM_RANCH",
+  TASTY: "TASTY",
+});
+
+const TRANSLATED = Object.freeze({
+  [KITCHEN.REGULAR_BUN]: { name: "Pão Regular", abbr: "PÃO REG" },
+  [KITCHEN.BIGMAC_BUN]: { name: "Pão de BigMac", abbr: "PÃO BIG" },
+  [KITCHEN.DARK_BUN]: { name: "Pão Escuro", abbr: "PÃO ESCURO" },
+  [KITCHEN.QUARTER_BUN]: { name: "Pão de Quarteirão", abbr: "PÃO QUARTEIRÃO" },
+  [KITCHEN.LETTUCE]: { name: "Alface", abbr: "ALFACE" },
+  [KITCHEN.PICLES]: { name: "Picles", abbr: "PICLES" },
+  [KITCHEN.SLI_CHEADDAR]: { name: "Cheaddar Fatiado", abbr: "CHEADDAR" },
+  [KITCHEN.REI_ONION]: { name: "Cebola Reidratada", abbr: "CEBOLA REIDR" },
+  [KITCHEN.FRESH_ONION]: { name: "Cebola Fresca", abbr: "CEBOLA FRES" },
+  [KITCHEN.SHOYO_ONION]: { name: "Cebola Shoyo", abbr: "CEB SHOYO" },
+  [KITCHEN.BIGMAC_SAUCE]: { name: "Molho BigMac", abbr: "MOLHO BIG" },
+  [KITCHEN.KETCHUP]: { name: "Ketchup", abbr: "KETCHUP" },
+  [KITCHEN.MUSTARD]: { name: "Mostarda", abbr: "MOSTARDA" },
+  [KITCHEN.CHEADDAR_MCMELT]: { name: "Molho Cheaddar McMelt", abbr: "MOLHO CHEADDAR" },
+  [KITCHEN.MAYONESE]: { name: "Méquinese", abbr: "MAIONESE" },
+  [KITCHEN.CBO]: { name: "Molho CBO", abbr: "CBO" },
+  [KITCHEN.CREAM_RANCH]: { name: "Molho Cream Ranch", abbr: "MOLHO RANCH" },
+  [KITCHEN.TASTY]: { name: "Molho Big Tasty", abbr: "MOLHO TASTY" },
+});
