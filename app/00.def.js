@@ -5,6 +5,8 @@ const Bread = Object.freeze({
   QUARTER_BUN: "QUARTER_BUN",
 });
 
+/** @typedef {typeof Bread[keyof typeof Bread]} Bread */
+
 const Condiment = Object.freeze({
   LETTUCE: "LETTUCE",
   PICLES: "PICLES",
@@ -13,6 +15,8 @@ const Condiment = Object.freeze({
   FRESH_ONION: "FRESH_ONION",
   SHOYO_ONION: "SHOYO_ONION",
 });
+
+/** @typedef {typeof Condiment[keyof typeof Condiment]} Condiment */
 
 const Sauce = Object.freeze({
   BIGMAC_SAUCE: "BIGMAC_SAUCE",
@@ -25,20 +29,20 @@ const Sauce = Object.freeze({
   TASTY: "TASTY",
 });
 
+/** @typedef {typeof Sauce[keyof typeof Sauce]} Sauce */
+
 const Patty = Object.freeze({
   QUARTER: "QUARTER",
   REGULAR: "REGULAR",
   CHICKEN: "CHICKEN",
 });
 
-/** @typedef {typeof Bread[keyof typeof Bread]} Bread */
-/** @typedef {typeof Condiment[keyof typeof Condiment]} Condiment */
-/** @typedef {typeof Sauce[keyof typeof Sauce]} Sauce */
 /** @typedef {typeof Patty[keyof typeof Patty]} Patty */
+
 /** @typedef {Bread | Condiment | Sauce | Patty} Ingredient */
 
 /** 
- * @type {Record<Bread | Condiment | Sauce | Patty, {
+ * @type {Ingredient, {
  *  name: string;
  *  abbr: string;
  * }>}
