@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☕ Mocha Chai</title>
+    <link rel="stylesheet" href="https://unpkg.com/mocha/mocha.css" />
+  </head>
+  <body id="mocha">
+
+    <script src="./app/00.def.js"></script>
+    <script src="./app/00.lib.js"></script>
+    <script src="./app/01.lunch.js"></script>
+
+    <script type="module">
+      import { expect } from "https://cdn.jsdelivr.net/npm/chai@5.1.1/+esm";
+      import "https://unpkg.com/mocha/mocha.js";
+
+      mocha.setup("bdd");
+
+      describe("After mocha setup", () => {
+        it("Should be OK", () =>
+          expect(1 + 1).to.equal(2));
+
+        it("Should throw an error", () =>
+          expect(() => {
+            throw new Error();
+          }).to.throw());
+      });
+
+      describe("First creation of the Lunch object", () => {
+        it("Should create a normal lunch", () =>
+          expect(() =>
+            new Lunch({
+              name: "Queijo Quente",
+              ingredients: [[Bread.SLI_CHEADDAR, 2]],
+            })).to.not.throw())
+
+        it("Shouldn't allow empty lunch names", () =>
+          expect(() =>
+            new Lunch({
+              name: "",
+              ingredients: [[Condiment.SLI_CHEADDAR, 2]],
+            })).to.throw());
+
+        it("Shouldn't allow empty ingredients list", () =>
+          expect(() =>
+            new Lunch({
+              name: "Queijo Quente",
+              ingredients: [],
+            })).to.throw());
+      });
+
+      mocha.run();
+    </script>
+
+  </body>
+</html>
