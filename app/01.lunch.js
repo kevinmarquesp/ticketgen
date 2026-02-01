@@ -1,3 +1,10 @@
+const LunchError = Object.freeze({
+  EMPTY_NAME_ERROR: "Empty name string not allowed",
+  EMPTY_INGREDIENTS_ERROR: "Empty ingredients lists not allowed",
+});
+
+/** @typedef {typeof LunchError[keyof typeof LunchError]} LUnchError */
+
 class Lunch {
   /** @type {string} */
   #name;
@@ -8,8 +15,8 @@ class Lunch {
   /** @type {[Ingredient, number][]} */
   #removed = [];
 
-  /** @type {{ from: Sauce, to: Sauce }?} */
-  #replaced;
+  /** @type {[Ingredient, number][]} */
+  #added = [];
 
   /**
    * @param {{
@@ -18,36 +25,60 @@ class Lunch {
    * }} _
    */
   constructor({ name, ingredients }) {
+    assert(name !== "", LunchError.EMPTY_NAME_ERROR);
+    assert(ingredients.length !== 0, LunchError.EMPTY_INGREDIENTS_ERROR);
+
     this.#ingredients = ingredients;
     this.#name = name;
+  }
+
+  /**
+   * 
+   * @returns {{
+   *  name: string;
+   *  ingredients: [Ingredient, number][];
+   *  removed: [Ingredient, number][];
+   *  added: [Ingredient, number][];
+   *  state: [Ingredient, number][];
+   * }}
+   */
+  inspect() {
+    // TODO: Add some logic to generate the current state of the lunch.
+    
+    return {
+      name: this.#name,
+      ingredients: this.#ingredients,
+      removed: this.#removed,
+      added: this.#added,
+      state: [],
+    };
   }
 
   /**
    * @returns {string}
    */
   ticket() {
-    if (this.#removed.length === 0)
+    if (this.#removed.length === 0 && this.#added.length === 0)
       return this.#name;
 
     return "";
   }
 
   /**
-   * @param {Ingredient} ingredient
-   * @returns {Ingredient[]}
+   * @param {Ingredient} ingredient 
+   * @param {number} amnt 
+   * @returns {[Ingredient, number][]}
    */
-  remove(ingredient) {
+  remove(ingredient, amnt) {
     return [];
   }
 
   /**
-   * @param {{ from: Sauce, to: Sauce }} _
-   * @returns {[Sauce[], Sauce?]}
+   * @param {Ingredient} ingredient 
+   * @param {number} amnt 
+   * @returns {[Ingredient, number][]}
    */
-  altsauce({
-    from: oldsauce,
-    to: newsauce
-  }) {
-    return [[oldsauce], newsauce];
+  add(ingredient, amnt) {
+    return [];
   }
 }
