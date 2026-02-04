@@ -33,7 +33,7 @@
           expect(() =>
             new Lunch({
               name: "Queijo Quente",
-              ingredients: [[Bread.SLI_CHEADDAR, 2]],
+              ingredients: [[Condiment.SLI_CHEADDAR, 2]],
             })).to.not.throw())
 
         it("Shouldn't allow empty lunch names", () =>
@@ -49,6 +49,135 @@
               name: "Queijo Quente",
               ingredients: [],
             })).to.throw());
+
+        const BigMac = new Lunch({
+          name: "Big Mac",
+          ingredients: [
+            [Bread.BIGMAC_BUN, 1],
+            [Sauce.BIGMAC_SAUCE, 2],
+            [Condiment.REI_ONION, 2],
+            [Condiment.LETTUCE, 2],
+            [Condiment.PICLES, 2],
+            [Condiment.SLI_CHEADDAR, 1],
+          ],
+        });
+      });
+
+      describe("Lunch.add()", () => {
+        it("adds a non-bread ingredient", () => {
+          const lunch = new Lunch({
+            name: "Big Mac",
+            ingredients: [[Bread.BIGMAC_BUN, 1]],
+          });
+
+          const delta = lunch.add(Condiment.LETTUCE, 1);
+
+          expect(delta).to.deep.equal([[Condiment.LETTUCE, 1]]);
+        });
+
+        it("accumulates additions of the same ingredient", () => {
+          const lunch = new Lunch({
+            name: "Big Mac",
+            ingredients: [[Bread.BIGMAC_BUN, 1]],
+          });
+
+          lunch.add(Sauce.BIGMAC_SAUCE, 1);
+          const delta = lunch.add(Sauce.BIGMAC_SAUCE, 2);
+
+          expect(delta).to.deep.equal([[Sauce.BIGMAC_SAUCE, 3]]);
+        });
+
+        it("throws when adding any bun", () => {
+          const lunch = new Lunch({
+            name: "Quarterão",
+            ingredients: [[Bread.QUARTER_BUN, 1]],
+          });
+
+          expect(() =>
+            lunch.add(Bread.DARK_BUN, 1)
+          ).to.throw(LunchError.ADD_BUN_ERROR);
+        });
+
+        it("throws if amount is zero", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          expect(() =>
+            lunch.add(Condiment.PICLES, 0)
+          ).to.throw(LunchError.AMMOUNT_ZERO_ERROR);
+        });
+
+        it("throws when exceeding add limit", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          expect(() =>
+            lunch.add(Condiment.PICLES, MAX_LUNCH_CHANGES + 1)
+          ).to.throw(LunchError.LIMIT_ADD_EXCEDED_ERROR);
+        });
+      });
+
+      describe("Lunch.remove()", () => {
+        it("removes an ingredient (negative delta)", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          const delta = lunch.remove(Condiment.PICLES, 1);
+
+          expect(delta).to.deep.equal([[Condiment.PICLES, -1]]);
+        });
+
+        it("accumulates removals", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          lunch.remove(Condiment.PICLES, 1);
+          const delta = lunch.remove(Condiment.PICLES, 2);
+
+          expect(delta).to.deep.equal([[Condiment.PICLES, -3]]);
+        });
+
+        it("removes delta entry when amount returns to zero", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          lunch.add(Condiment.PICLES, 2);
+          const delta = lunch.remove(Condiment.PICLES, 2);
+
+          expect(delta).to.deep.equal([]);
+        });
+
+        it("throws if amount is zero", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          expect(() =>
+            lunch.remove(Condiment.PICLES, 0)
+          ).to.throw(LunchError.AMMOUNT_ZERO_ERROR);
+        });
+
+        it("throws when exceeding remove limit", () => {
+          const lunch = new Lunch({
+            name: "Test",
+            ingredients: [[Bread.REGULAR_BUN, 1]],
+          });
+
+          expect(() =>
+            lunch.remove(Condiment.PICLES, MAX_LUNCH_CHANGES + 1)
+          ).to.throw(LunchError.LIMIT_RMV_EXCEDED_ERROR);
+        });
       });
 
       mocha.run();
