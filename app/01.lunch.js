@@ -1,6 +1,12 @@
+const MAX_LUNCH_CHANGES = 99;
+
 const LunchError = Object.freeze({
   EMPTY_NAME_ERROR: "Empty name string not allowed",
   EMPTY_INGREDIENTS_ERROR: "Empty ingredients lists not allowed",
+  ADD_BUN_ERROR: "Can't add more than one bun",
+  AMMOUNT_ZERO_ERROR: "Can't use 0 for ingredient ammount",
+  LIMIT_ADD_EXCEDED_ERROR: `Limit of ${MAX_LUNCH_CHANGES} adds was exceded`,
+  LIMIT_RMV_EXCEDED_ERROR: `Limit of ${MAX_LUNCH_CHANGES} removes was exceded`,
 });
 
 /** @typedef {typeof LunchError[keyof typeof LunchError]} LUnchError */
@@ -13,10 +19,7 @@ class Lunch {
   #ingredients;
 
   /** @type {[Ingredient, number][]} */
-  #removed = [];
-
-  /** @type {[Ingredient, number][]} */
-  #added = [];
+  #delta = [];
 
   /**
    * @param {{
@@ -37,20 +40,14 @@ class Lunch {
    * @returns {{
    *  name: string;
    *  ingredients: [Ingredient, number][];
-   *  removed: [Ingredient, number][];
-   *  added: [Ingredient, number][];
-   *  state: [Ingredient, number][];
+   *  delta: [Ingredient, number][];
    * }}
    */
   inspect() {
-    // TODO: Add some logic to generate the current state of the lunch.
-    
     return {
       name: this.#name,
       ingredients: this.#ingredients,
-      removed: this.#removed,
-      added: this.#added,
-      state: [],
+      delta: this.#delta,
     };
   }
 
@@ -58,7 +55,7 @@ class Lunch {
    * @returns {string}
    */
   ticket() {
-    if (this.#removed.length === 0 && this.#added.length === 0)
+    if (this.#delta.length === 0)
       return this.#name;
 
     return "";
@@ -70,7 +67,11 @@ class Lunch {
    * @returns {[Ingredient, number][]}
    */
   remove(ingredient, amnt) {
-    return [];
+    assert(amnt > 0, LunchError.AMMOUNT_ZERO_ERROR);
+
+    this.#change(ingredient, -1 * amnt);
+
+    return [...this.#delta];
   }
 
   /**
@@ -79,6 +80,46 @@ class Lunch {
    * @returns {[Ingredient, number][]}
    */
   add(ingredient, amnt) {
-    return [];
+    assert(amnt > 0, LunchError.AMMOUNT_ZERO_ERROR);
+    assert(!(Object.values(Bread).includes(ingredient)),
+      LunchError.ADD_BUN_ERROR);
+
+    this.#change(ingredient, amnt);
+
+    return [...this.#delta];
+  }
+
+  /**
+   * @param {Ingredient} ingredient 
+   * @param {number} amnt 
+   */
+  #change(ingredient, amnt) {
+    const exists = this.#delta.some(([i]) => i === ingredient);
+
+    if (!exists) {
+      assertBoundary(amnt);
+      this.#delta.push([ingredient, amnt]);
+
+      return;
+    }
+
+    this.#delta = this.#delta
+      .map(([i, a]) => {
+        if (i !== ingredient)
+          return [i, a];
+
+        assertBoundary(a + amnt);
+
+        return [i, a + amnt];
+      })
+      .filter(([_, a]) => a !== 0);
+
+      /**
+       * @param {number} amnt 
+       */
+      function assertBoundary(next) {
+        assert(next <= MAX_LUNCH_CHANGES, LunchError.LIMIT_ADD_EXCEDED_ERROR);
+        assert(next >= -MAX_LUNCH_CHANGES, LunchError.LIMIT_RMV_EXCEDED_ERROR);
+      }
   }
 }
