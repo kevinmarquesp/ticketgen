@@ -9,6 +9,12 @@ const LunchError = Object.freeze({
   LIMIT_RMV_EXCEDED_ERROR: `Limit of ${MAX_LUNCH_CHANGES} removes was exceded`,
 });
 
+const GRILL_CORE = new Set([
+  ...Object.values(Bread),
+  ...Object.values(Patty),
+  Condiment.SLI_CHEADDAR,
+]);
+
 /** @typedef {typeof LunchError[keyof typeof LunchError]} LUnchError */
 
 class Lunch {
@@ -31,6 +37,8 @@ class Lunch {
     assert(name !== "", LunchError.EMPTY_NAME_ERROR);
     assert(ingredients.length !== 0, LunchError.EMPTY_INGREDIENTS_ERROR);
 
+    // TODO: Assert no amount equal to 0 for each ingredient.
+
     this.#ingredients = ingredients;
     this.#name = name;
   }
@@ -52,13 +60,12 @@ class Lunch {
   }
 
   /**
-   * @returns {string}
+   * @returns {string[]}
    */
   ticket() {
-    if (this.#delta.length === 0)
-      return this.#name;
+    const lines = [this.#name];
 
-    return "";
+    return lines;
   }
 
   /**

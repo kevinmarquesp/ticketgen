@@ -33,14 +33,14 @@
           expect(() =>
             new Lunch({
               name: "Queijo Quente",
-              ingredients: [[Condiment.SLI_CHEADDAR, 2]],
+              ingredients: [[Condiment.SLI_CHEEXTRAAR, 2]],
             })).to.not.throw())
 
         it("Shouldn't allow empty lunch names", () =>
           expect(() =>
             new Lunch({
               name: "",
-              ingredients: [[Condiment.SLI_CHEADDAR, 2]],
+              ingredients: [[Condiment.SLI_CHEEXTRAAR, 2]],
             })).to.throw());
 
         it("Shouldn't allow empty ingredients list", () =>
@@ -58,7 +58,7 @@
             [Condiment.REI_ONION, 2],
             [Condiment.LETTUCE, 2],
             [Condiment.PICLES, 2],
-            [Condiment.SLI_CHEADDAR, 1],
+            [Condiment.SLI_CHEEXTRAAR, 1],
           ],
         });
       });
@@ -95,7 +95,7 @@
 
           expect(() =>
             lunch.add(Bread.DARK_BUN, 1)
-          ).to.throw(LunchError.ADD_BUN_ERROR);
+          ).to.throw(LunchError.EXTRA_BUN_ERROR);
         });
 
         it("throws if amount is zero", () => {
@@ -117,7 +117,7 @@
 
           expect(() =>
             lunch.add(Condiment.PICLES, MAX_LUNCH_CHANGES + 1)
-          ).to.throw(LunchError.LIMIT_ADD_EXCEDED_ERROR);
+          ).to.throw(LunchError.LIMIT_EXTRA_EXCEDED_ERROR);
         });
       });
 
@@ -177,6 +177,178 @@
           expect(() =>
             lunch.remove(Condiment.PICLES, MAX_LUNCH_CHANGES + 1)
           ).to.throw(LunchError.LIMIT_RMV_EXCEDED_ERROR);
+        });
+      });
+
+      describe("Lunch.ticket()", () => {
+        it("returns only the name when there are no changes", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Condiment.SLI_CHEADDAR, 1],
+              [Sauce.MUSTARD, 1],
+            ],
+          });
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+          ]);
+        });
+
+        it("prints SEM for a removed non-core ingredient when not GRILL", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Sauce.MUSTARD, 1],
+              [Sauce.KETCHUP, 1],
+              [Sauce.PICLES, 1],
+            ],
+          });
+
+          lunch.remove(Sauce.MUSTARD, 1);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\tSEM MOSTARDA",
+          ]);
+        });
+
+        it("prints EXTRA X for adding one ingredient", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Condiment.SLI_CHEADDAR, 1],
+              [Sauce.KETCHUP, 1],
+              [Sauce.MUSTARD, 1],
+            ],
+          });
+
+          lunch.add(Condiment.SLI_CHEADDAR, 1);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\tEXTRA CHEADDAR",
+          ]);
+        });
+
+        it("prints EXTRA N X for adding multiple units", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Condiment.SLI_CHEADDAR, 1],
+              [Sauce.KETCHUP, 1],
+              [Sauce.MUSTARD, 1],
+            ],
+          });
+
+          lunch.add(Condiment.SLI_CHEADDAR, 3);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\tEXTRA 3 CHEADDAR",
+          ]);
+        });
+
+        it("uses *GRILL when only bread and patty remain", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Sauce.MUSTARD, 1],
+              [Sauce.KETCHUP, 1],
+            ],
+          });
+
+          lunch.remove(Sauce.MUSTARD, 1);
+          lunch.remove(Sauce.KETCHUP, 1);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\t*GRILL",
+          ]);
+        });
+
+        it("uses *GRILL and prints SEM for removed GRILL_CORE ingredient (cheese)", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Condiment.SLI_CHEADDAR, 1],
+            ],
+          });
+
+          lunch.remove(Condiment.SLI_CHEADDAR, 1);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\t*GRILL",
+            "\tSEM CHEADDAR",
+          ]);
+        });
+
+        it("uses *GRILL and prints EXTRA for GRILL_CORE ingredient", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+            ],
+          });
+
+          lunch.add(Condiment.SLI_CHEADDAR, 1);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\t*GRILL",
+            "\tEXTRA CHEADDAR",
+          ]);
+        });
+
+        it("uses *GRILL and prints EXTRA N X for multiple core additions", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger Duplo",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+            ],
+          });
+
+          lunch.add(Condiment.SLI_CHEADDAR, 2);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger Duplo",
+            "\t*GRILL",
+            "\tEXTRA 2 CHEADDAR",
+          ]);
+        });
+
+        it("does NOT print SEM for removed sauces when *GRILL is active", () => {
+          const lunch = new Lunch({
+            name: "Cheeseburger",
+            ingredients: [
+              [Bread.REGULAR_BUN, 1],
+              [Patty.REGULAR, 1],
+              [Condiment.SLI_CHEADDAR, 1],
+              [Sauce.MUSTARD, 1],
+            ],
+          });
+
+          lunch.remove(Sauce.MUSTARD, 1);
+
+          expect(lunch.ticket()).to.deep.equal([
+            "Cheeseburger",
+            "\t*GRILL",
+          ]);
         });
       });
 
