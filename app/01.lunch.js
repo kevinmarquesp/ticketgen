@@ -64,8 +64,68 @@ class Lunch {
    */
   ticket() {
     const lines = [this.#name];
+    const deltaIngredients = new Set(this.#delta.map(([ingr]) => ingr));
 
-    return lines;
+    // Combines both ingredients with delta in a detailed matrix.
+
+    const matrix = [
+      ...this.#delta
+        .map(([ingr, delt]) => {
+          const registered = this.#ingredients
+            .find(([i]) => i === ingr);
+
+          const amnt = registered ? registered[1] : 0;
+          const diff = amnt + delt;
+
+          return [ingr, amnt, delt, diff];
+        }),
+      ...this.#ingredients
+        .filter(([ingr]) =>
+          !deltaIngredients.has(ingr))
+        .map(([ingr, amnt]) =>
+          [ingr, amnt, 0, amnt]),
+    ];
+
+    // Determine if the lunch configuration is GRILL or not.
+
+    const ignorable = new Set(this.#ingredients
+      .filter(([ingr]) => !GRILL_CORE.has(ingr))
+      .map(([ingr]) => ingr));
+
+    const grill = [...ignorable]
+      .every((igno) => matrix
+        .some(([ingr,,, diff]) => igno === ingr && diff <= 0));
+
+    const printable =  grill ?
+      matrix.filter(([ingr]) => !ignorable.has(ingr)) :
+      matrix;
+
+    // Converts everything into a readable string.
+
+    if (grill)
+      lines.push("\t*GRILL");
+
+    return [
+      ...lines,
+      ...printable
+        .filter(([,, delt]) =>
+          delt !== 0)
+        .map(([ingr, amnt, delt, diff]) => {
+          const trans = Translate[ingr].abbr;
+          
+          if (diff <= 0)
+            return `\tSEM ${trans}`;
+
+          if (diff < amnt)
+            return `\tMENOS ${Math.abs(delt)} ${trans}`;
+
+          if (diff > amnt && delt === 1)
+            return `\tEXTRA ${trans}`;
+
+          return `\tEXTRA ${delt} ${trans}`;
+        })
+        .sort(),
+    ];
   }
 
   /**
@@ -75,6 +135,8 @@ class Lunch {
    */
   remove(ingredient, amnt) {
     assert(amnt > 0, LunchError.AMMOUNT_ZERO_ERROR);
+
+    // TODO: Assert that the ingredient exists, at least in delta.
 
     this.#change(ingredient, -1 * amnt);
 
