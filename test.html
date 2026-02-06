@@ -125,7 +125,10 @@
         it("removes an ingredient (negative delta)", () => {
           const lunch = new Lunch({
             name: "Test",
-            ingredients: [[Bread.REGULAR_BUN, 1]],
+            ingredients: [
+							[Bread.REGULAR_BUN, 1],
+							[Condiment.PICLES, 1],
+						],
           });
 
           const delta = lunch.remove(Condiment.PICLES, 1);
@@ -136,7 +139,10 @@
         it("accumulates removals", () => {
           const lunch = new Lunch({
             name: "Test",
-            ingredients: [[Bread.REGULAR_BUN, 1]],
+            ingredients: [
+							[Bread.REGULAR_BUN, 1],
+							[Condiment.PICLES, 1],
+						],
           });
 
           lunch.remove(Condiment.PICLES, 1);
@@ -171,7 +177,10 @@
         it("throws when exceeding remove limit", () => {
           const lunch = new Lunch({
             name: "Test",
-            ingredients: [[Bread.REGULAR_BUN, 1]],
+            ingredients: [
+							[Bread.REGULAR_BUN, 1],
+							[Condiment.PICLES, 1],
+						],
           });
 
           expect(() =>
