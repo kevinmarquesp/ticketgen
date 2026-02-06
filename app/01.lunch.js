@@ -7,6 +7,8 @@ const LunchError = Object.freeze({
   AMMOUNT_ZERO_ERROR: "Can't use 0 for ingredient ammount",
   LIMIT_ADD_EXCEDED_ERROR: `Limit of ${MAX_LUNCH_CHANGES} adds was exceded`,
   LIMIT_RMV_EXCEDED_ERROR: `Limit of ${MAX_LUNCH_CHANGES} removes was exceded`,
+  ZERO_AMOUNT_ERROR: 'Invalid ingredient ammount, less than 0 is invalid',
+  NON_EXISTING_REMOVAL_ERROR: "Atempted to remove a non existing ingredient",
 });
 
 const GRILL_CORE = new Set([
@@ -37,7 +39,9 @@ class Lunch {
     assert(name !== "", LunchError.EMPTY_NAME_ERROR);
     assert(ingredients.length !== 0, LunchError.EMPTY_INGREDIENTS_ERROR);
 
-    // TODO: Assert no amount equal to 0 for each ingredient.
+    for (const [, amnt] of ingredients) {
+      assert(amnt > 0, LunchError.ZERO_AMOUNT_ERROR);
+    }
 
     this.#ingredients = ingredients;
     this.#name = name;
@@ -136,7 +140,13 @@ class Lunch {
   remove(ingredient, amnt) {
     assert(amnt > 0, LunchError.AMMOUNT_ZERO_ERROR);
 
-    // TODO: Assert that the ingredient exists, at least in delta.
+    const ingredientsSet = new Set([
+      ...this.#ingredients.map(([ingr]) => ingr),
+      ...this.#delta.map(([ingr]) => ingr),
+    ]);
+
+    assert(ingredientsSet.has(ingredient),
+      LunchError.NON_EXISTING_REMOVAL_ERROR);
 
     this.#change(ingredient, -1 * amnt);
 
